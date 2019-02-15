@@ -315,18 +315,25 @@ class Create {
 			if(!$data || (!isset($data->exerciseid) && !isset($data->exercisecode)) || !isset($data->filename) || !isset($data->level))
 				throw new Exception("Invalid parameters", 1000);
 			
+			/**
+			Uploading more than one video (e.g. creating multiple exercises) fails.
+			There is no error message but Cancel button stays active and no other actions are possible.
+			After logout/logging in or just open GUI in another tab upload is possible again.
+			Found that first upload doeas not submit exerciseid, subsequent do but the id is every time the one
+			bound to the first submitted exercise. So every time create id seems good solution.
+			*/
 			//Retrieve the ID for the given exercise code
-			if(!isset($data->exerciseid)){
+			//if(!isset($data->exerciseid)){
 				$e = new Exercise();
 				$exercise = $e->getExerciseByCode($data->exercisecode);
 				if(!$exercise)
 					throw new Exception("Exercise code doesn't exist",1003);
 				$instanceid = $exercise->id;
 				$instancecode = $data->exercisecode;
-			} else {
-				$instanceid = $data->exerciseid;
-				$instancecode = $data->exercisecode;
-			}
+			//} else {
+			//	$instanceid = $data->exerciseid;
+			//	$instancecode = $data->exercisecode;
+			//}
 			
 			//Check if media has already been added for the given 'instanceid', 'component' and 'level'
 			$sql = "SELECT id FROM media WHERE instanceid=%d AND component='%s' AND level=%d";
